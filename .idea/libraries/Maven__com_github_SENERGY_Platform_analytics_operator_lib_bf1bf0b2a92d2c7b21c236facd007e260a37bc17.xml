@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.github.SENERGY-Platform:analytics-operator-lib:bf1bf0b2a92d2c7b21c236facd007e260a37bc17">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/SENERGY-Platform/analytics-operator-lib/bf1bf0b2a92d2c7b21c236facd007e260a37bc17/analytics-operator-lib-bf1bf0b2a92d2c7b21c236facd007e260a37bc17.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/SENERGY-Platform/analytics-operator-lib/bf1bf0b2a92d2c7b21c236facd007e260a37bc17/analytics-operator-lib-bf1bf0b2a92d2c7b21c236facd007e260a37bc17-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/SENERGY-Platform/analytics-operator-lib/bf1bf0b2a92d2c7b21c236facd007e260a37bc17/analytics-operator-lib-bf1bf0b2a92d2c7b21c236facd007e260a37bc17-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

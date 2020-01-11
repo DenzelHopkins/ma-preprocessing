@@ -1,8 +1,24 @@
+import com.google.gson.Gson;
+import kafka.utils.Json;
+import kafka.utils.json.JsonArray;
+import kafka.utils.json.JsonObject;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.infai.seits.sepl.operators.Message;
 import org.infai.seits.sepl.operators.OperatorInterface;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+
+import java.io.IOException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.util.*;
 
 public class PreProcessing implements OperatorInterface {
@@ -35,7 +51,11 @@ public class PreProcessing implements OperatorInterface {
                 segment.add(message);
                 startTime = time;
             } else if (Duration.between(startTime, time).getSeconds() > windowSize) {
-                featureExtraction(segment);
+                try {
+                    featureExtraction(segment);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 segment.clear();
                 segment.add(message);
                 startTime = time;
@@ -54,7 +74,7 @@ public class PreProcessing implements OperatorInterface {
         message.addInput("device");
     }
 
-    public ArrayList featureExtraction(Stack<Message> segment) {
+    public ArrayList featureExtraction(Stack<Message> segment) throws IOException {
         System.out.println("New Segment");
 
         /* [Late night, Morning, Noon, Afternoon, Evening, Night,
@@ -71,7 +91,7 @@ public class PreProcessing implements OperatorInterface {
         String device;
         String value;
 
-        ArrayList<Double> motionSensors = new ArrayList<>(Collections.nCopies(amountOfMotionSensors*2, 0.0)); /*[M001ON, M002ON, ... , M031OFF, MO32OFF]*/
+        ArrayList<Double> motionSensors = new ArrayList<>(Collections.nCopies(amountOfMotionSensors * 2, 0.0)); /*[M001ON, M002ON, ... , M031OFF, MO32OFF]*/
         Integer currentSensorNumber;
 
         Message m;
@@ -178,10 +198,24 @@ public class PreProcessing implements OperatorInterface {
         }
 
         feature.addAll(motionSensors);
-        feature.add(triggeredMotionSensors);
+        //feature.add(triggeredMotionSensors); WIE normalisieren?
 
-        System.out.println(feature.size());
-        System.out.println(feature);
+
+        Date date = Date.from( startTime.atZone( ZoneId.systemDefault()).toInstant());
+        feature.add((double) date.getTime());
+
+        HttpPost post = new HttpPost("http://127.0.0.1:5000/discovery");
+
+        String json = new Gson().toJson(feature);
+
+        StringEntity stringEntity = new StringEntity(json);
+        post.setEntity(stringEntity);
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpClient.execute(post)) {
+
+            System.out.println(EntityUtils.toString(response.getEntity()));
+        }
 
         return null;
     }
