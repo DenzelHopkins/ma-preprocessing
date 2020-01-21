@@ -11,7 +11,7 @@ import java.util.List;
 
 public class TestMessageProvider {
     public static List<Message> getTestMesssagesSet() throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader("src/test/resources/dataBig.json"));
+        BufferedReader br = new BufferedReader(new FileReader("src/test/resources/arubaSmall.json"));
         Builder builder = new Builder("1", "1");
         List<Message> messageSet = new ArrayList<>();
         JSONObject config = getConfig();
@@ -36,6 +36,7 @@ public class TestMessageProvider {
                         .put(new JSONObject().put("Source", "value.reading.timestamp").put("Dest", "timestamp"))
                         .put(new JSONObject().put("Source", "value.reading.value").put("Dest", "value"))
                         .put(new JSONObject().put("Source", "value.reading.device").put("Dest", "device"))
+                        .put(new JSONObject().put("Source", "value.reading.activity").put("Dest", "activity"))
                 )));
         return config;
     }
