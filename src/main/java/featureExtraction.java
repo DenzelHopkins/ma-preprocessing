@@ -26,7 +26,6 @@ public class featureExtraction {
 
     HttpPost post = new HttpPost("http://127.0.0.1:5000/discovery");
     StringEntity stringEntity;
-    JSONObject result;
     JSONObject jsonRequest;
 
 
@@ -47,6 +46,7 @@ public class featureExtraction {
 
         feature.clear();
         motionSensors = new ArrayList<>(Collections.nCopies(amountOfMotionSensors * 2, 0.0)); /*[M001ON, M002ON, ... , M031OFF, MO32OFF]*/
+        triggeredMotionSensors = 0;
         
         for (int i = 0; i < segment.size(); i++) {
             m = segment.pop();
@@ -96,6 +96,8 @@ public class featureExtraction {
                     case 0:
                         feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 1.0, 0.0));
                         break;
+                    default:
+                        feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
                 }
 
                 /*DayOfWeek*/
@@ -121,6 +123,9 @@ public class featureExtraction {
                     case SUNDAY:
                         feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0));
                         break;
+                    default:
+                        System.out.println("--------------------NO WEEKDAY SET ");
+                        feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
                 }
 
                 /*WeekendOrNot*/
@@ -131,11 +136,16 @@ public class featureExtraction {
                     case THURSDAY:
                         feature.addAll(Arrays.asList(1.0, 0.0));
                         break;
+                    case FRIDAY:
                     case SATURDAY:
                     case SUNDAY:
                         feature.addAll(Arrays.asList(0.0, 1.0));
                         break;
+                    default:
+                        System.out.println("--------------------NO WEEKEND SET ");
+                        feature.addAll(Arrays.asList(0.0, 0.0));
                 }
+
             }
 
             if (device.contains("M")) {
@@ -154,7 +164,6 @@ public class featureExtraction {
         // mehr features???
 
         // add time feature
-        System.out.println(startTime.toString());
         Date date = Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
         feature.add((double) date.getTime());
 

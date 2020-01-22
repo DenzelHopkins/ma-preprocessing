@@ -17,10 +17,7 @@ public class TestPreprocessing {
             pre.config(m);
             pre.run(m);
         }
-
         System.out.println(pre.solution.toString());
-
-
     }
 
     @Test
