@@ -1,14 +1,6 @@
-import com.google.gson.Gson;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
 import org.infai.seits.sepl.operators.Message;
 import org.infai.seits.sepl.operators.OperatorInterface;
 
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -16,7 +8,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class PreProcessing implements OperatorInterface {
+public class preProcessing implements OperatorInterface {
 
     protected Stack<Message> segment;
     protected int windowSize;
@@ -30,7 +22,7 @@ public class PreProcessing implements OperatorInterface {
 
     protected featureExtraction extraction;
 
-    public PreProcessing() {
+    public preProcessing() {
         segment = new Stack<>();
         windowSize = 120;
         amountOfMotionSensors = 32;

@@ -1,17 +1,15 @@
 import org.infai.seits.sepl.operators.Message;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TestPreprocessing {
 
     public void run() throws Exception {
-        PreProcessing pre = new PreProcessing();
+        preProcessing pre = new preProcessing();
         List<Message> messages = TestMessageProvider.getTestMesssagesSet();
-        int data_size = messages.size();
-        // int data_size = 200000;
+        // int data_size = messages.size();
+        int data_size = 500000;
         for (int i = 0; i < data_size; i++) {
             Message m = messages.get(i);
             pre.config(m);
