@@ -18,29 +18,14 @@ public class TestPreprocessing {
         preProcessing pre = new preProcessing();
         List<Message> messages = TestMessageProvider.getTestMesssagesSet();
         int data_size = messages.size();
-        //int data_size = 500000;
         for (int i = 0; i < data_size; i++) {
             Message m = messages.get(i);
             pre.config(m);
             pre.run(m);
         }
 
-        // get solutions
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        try {
-            CloseableHttpResponse response = httpClient.execute(new HttpGet("http://127.0.0.1:5000/solution"));
-            try {
-                JSONObject result = new JSONObject(EntityUtils.toString(response.getEntity()));
-                String founded_activities = result.get("founded_activities").toString();
-                String accuracy = result.get("accuracy").toString();
-                System.out.println("Founded activities are: " + founded_activities);
-                System.out.println("Accuracy is: " + accuracy);
-            } finally {
-                response.close();
-            }
-        } finally {
-            httpClient.close();
-        }
+        requestHandler requestHandler = new requestHandler();
+        requestHandler.getSolutions();
     }
 
     @Test

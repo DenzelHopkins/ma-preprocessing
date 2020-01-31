@@ -1,9 +1,3 @@
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.infai.seits.sepl.operators.Message;
 import org.json.JSONObject;
 
@@ -24,10 +18,8 @@ public class featureExtraction {
     int amountOfMotionSensors;
     int triggeredMotionSensors;
 
-    HttpPost post = new HttpPost("http://127.0.0.1:5000/discovery");
-    StringEntity stringEntity;
-    JSONObject jsonRequest;
-
+    requestHandler requestHandler = new requestHandler();
+    JSONObject jsonRequest = new JSONObject();
 
     public featureExtraction(int MotionSensors) {
 
@@ -172,28 +164,8 @@ public class featureExtraction {
         }
 
         // http request to the server with the featureSegment and set answer to solution
-        {
-            jsonRequest = new JSONObject();
-            jsonRequest.put("label", label);
-            jsonRequest.put("feature", feature);
-
-            stringEntity = new StringEntity(jsonRequest.toString());
-            post.setEntity(stringEntity);
-
-
-            CloseableHttpClient httpClient = HttpClients.createDefault();
-            try{
-                CloseableHttpResponse response = httpClient.execute(post);
-                try {
-                    JSONObject result = new JSONObject(EntityUtils.toString(response.getEntity()));
-                    result.get("answer").toString();
-                } finally {
-                    response.close();
-                }
-            } finally {
-                httpClient.close();
-            }
-        }
-
+        jsonRequest.put("label", label);
+        jsonRequest.put("feature", feature);
+        requestHandler.postSegment(jsonRequest);
     }
 }
