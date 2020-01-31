@@ -28,19 +28,6 @@ public class preProcessing implements OperatorInterface {
         amountOfMotionSensors = 32;
         jsonRequest = new JSONObject();
         extraction = new featureExtraction(amountOfMotionSensors);
-
-        solution = new HashMap<>();
-        solution.put("Sleeping", 0);
-        solution.put("Meal_Preparation", 0);
-        solution.put("Relax", 0);
-        solution.put("Eating", 0);
-        solution.put("Work", 0);
-        solution.put("Wash_Dishes", 0);
-        solution.put("Bed_to_Toilet", 0);
-        solution.put("Enter_Home", 0);
-        solution.put("Leave_Home", 0);
-        solution.put("Housekeeping", 0);
-        solution.put("Resperate", 0);
     }
 
     @Override
@@ -59,7 +46,7 @@ public class preProcessing implements OperatorInterface {
                 startTime = time;
             } else if (Duration.between(startTime, time).getSeconds() > windowSize) {
                 try {
-                    extraction.run(segment, label, startTime, solution);
+                    extraction.run(segment, label, startTime);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

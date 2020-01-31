@@ -42,7 +42,7 @@ public class featureExtraction {
 
     }
 
-    public void run(Stack<Message> segment, String label, LocalDateTime startTime, Map<String, Integer> solution) throws IOException {
+    public void run(Stack<Message> segment, String label, LocalDateTime startTime) throws IOException {
 
         feature.clear();
         motionSensors = new ArrayList<>(Collections.nCopies(amountOfMotionSensors * 2, 0.0)); /*[M001ON, M002ON, ... , M031OFF, MO32OFF]*/
@@ -180,13 +180,18 @@ public class featureExtraction {
             stringEntity = new StringEntity(jsonRequest.toString());
             post.setEntity(stringEntity);
 
-            try (CloseableHttpClient httpClient = HttpClients.createDefault();
-                 CloseableHttpResponse response = httpClient.execute(post)) {
-                JSONObject result = new JSONObject(EntityUtils.toString(response.getEntity()));
-                String predLabel = result.get("text").toString();
-                if (solution.containsKey(predLabel)) {
-                    solution.replace(predLabel, (solution.get(predLabel) + 1));
+
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            try{
+                CloseableHttpResponse response = httpClient.execute(post);
+                try {
+                    JSONObject result = new JSONObject(EntityUtils.toString(response.getEntity()));
+                    result.get("answer").toString();
+                } finally {
+                    response.close();
                 }
+            } finally {
+                httpClient.close();
             }
         }
 
