@@ -3,4 +3,4 @@ data/aruba
 target/test-classes/aruba.json
 target/test-classes
 src/test/resources/.aruba.json.swp
-target
+target/*
