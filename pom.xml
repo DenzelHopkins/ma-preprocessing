@@ -2,7 +2,7 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.infai.seits.sepl.operators</groupId>
-    <artifactId>operator-estimator</artifactId>
+    <artifactId>preprocessing</artifactId>
     <packaging>jar</packaging>
     <version>0.1</version>
 

@@ -40,7 +40,6 @@ public class featureExtraction {
         motionSensors = new ArrayList<>(Collections.nCopies(amountOfMotionSensors * 2, 0.0)); /*[M001ON, M002ON, ... , M031OFF, MO32OFF]*/
         triggeredMotionSensors = 0;
 
-
         // building featureSegment
         {
             for (int i = 0; i < segment.size(); i++) {
@@ -169,3 +168,5 @@ public class featureExtraction {
         requestHandler.postSegment(jsonRequest);
     }
 }
+
+

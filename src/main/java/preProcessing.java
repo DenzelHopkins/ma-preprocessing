@@ -14,7 +14,6 @@ public class preProcessing implements OperatorInterface {
     protected int windowSize;
     protected LocalDateTime startTime;
     protected int amountOfMotionSensors;
-    protected Map<String, Integer> solution;
     protected JSONObject jsonRequest;
 
     protected String time_to_parse;
