@@ -19,30 +19,29 @@ public class FeatureExtraction {
     int amountOfMotionSensors;
     int amountOfDoorSensors;
     double triggeredMotionSensors;
+    double triggeredDoorSensors;
 
-    double minTriggeredMotionSensors = 0;
-    double maxTriggeredMotionSensors = 0;
-
+    double maxSensors;
 
     RequestHandler requestHandler = new RequestHandler();
     JSONObject jsonRequest = new JSONObject();
 
-    public FeatureExtraction(int MotionSensors, int DoorSensors) {
+    public FeatureExtraction(int MotionSensors, int DoorSensors, int WindowSize) {
 
          /* [Late night, Morning, Noon, Afternoon, Evening, Night,
             Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday,
             Weekday, Weekend,
-            M001ON, M002ON, ... , M031OFF, MO32OFF,
-            TotalTriggeredMotionSensors]*/
+            M001ON, M002ON, ... , M031OFF, MO32OFF,D001ON,D002ON,..., D004OFF,
+            TotalTriggeredMotionSensors, TotalTriggeredDoorSensors]*/
 
         feature = new ArrayList<>();
         amountOfMotionSensors = MotionSensors;
         amountOfDoorSensors = DoorSensors;
+        maxSensors = WindowSize;
 
     }
 
-    public void run(Stack<Message> segment, String label, LocalDateTime startTime) throws IOException {
-
+    public void run(Stack<Message> segment, String label, LocalDateTime startTime, Boolean training, Boolean manuellSegmentation) throws IOException {
         feature.clear();
         motionSensors = new ArrayList<>(Collections.nCopies(amountOfMotionSensors * 2, 0.0)); /*[M001ON, M002ON, ... , M031OFF, MO32OFF]*/
         doorSensors = new ArrayList<>(Collections.nCopies(amountOfDoorSensors * 2, 0.0)); /*[M001ON, M002ON, ... , M031OFF, MO32OFF]*/
@@ -101,7 +100,6 @@ public class FeatureExtraction {
                         default:
                             feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
                     }
-
                     /*DayOfWeek*/
                     switch (time.getDayOfWeek()) {
                         case MONDAY:
@@ -129,7 +127,6 @@ public class FeatureExtraction {
                             System.out.println("--------------------NO WEEKDAY SET ");
                             feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
                     }
-
                     /*WeekendOrNot*/
                     switch (time.getDayOfWeek()) {
                         case MONDAY:
@@ -147,7 +144,6 @@ public class FeatureExtraction {
                             System.out.println("--------------------NO WEEKEND SET ");
                             feature.addAll(Arrays.asList(0.0, 0.0));
                     }
-
                 }
 
                 currentSensorNumber = Integer.parseInt(device.replaceAll("\\D+", ""));
@@ -163,28 +159,25 @@ public class FeatureExtraction {
                 }
 
                 /* DoorSensor triggered or not */
-                if (device.contains("D")) {
+                else if (device.contains("D")) {
                     if (value.equals("ON") && doorSensors.get(currentSensorNumber - 1) == 0.0) {
                         doorSensors.set(currentSensorNumber - 1, 1.0);
                     } else if (value.equals("OFF") && doorSensors.get(currentSensorNumber + amountOfDoorSensors - 1) == 0.0) {
                         doorSensors.set(currentSensorNumber + amountOfDoorSensors - 1, 1.0);
                     }
+                    triggeredDoorSensors++;
                 }
             }
 
-//            if (minTriggeredMotionSensors > triggeredMotionSensors){
-//                minTriggeredMotionSensors = triggeredMotionSensors;
-//            }
-//            if(maxTriggeredMotionSensors < triggeredMotionSensors){
-//                maxTriggeredMotionSensors = triggeredMotionSensors;
-//            }
-//            /* Amount of triggered motionSensors */
-//            double triggeredMotionSensorsPre = (triggeredMotionSensors - minTriggeredMotionSensors) / (maxTriggeredMotionSensors - minTriggeredMotionSensors);
+
+            /* Amount of triggered motionSensors and doorSensors */
+//            double triggeredMotionSensorsPre = (triggeredMotionSensors - 0) / (maxSensors - 0);
+//            double triggeredDoorSensorsPre = (triggeredDoorSensors - 0) / (maxSensors - 0);
 //            feature.add(triggeredMotionSensorsPre);
+//            feature.add(triggeredDoorSensorsPre);
 
-
+            feature.addAll(doorSensors);
             feature.addAll(motionSensors);
-
             // add time feature
             Date date = Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
             feature.add((double) date.getTime());
@@ -193,6 +186,9 @@ public class FeatureExtraction {
         // http request to the server with the featureSegment and set answer to solution
         jsonRequest.put("label", label);
         jsonRequest.put("feature", feature);
+        jsonRequest.put("training", training);
+        jsonRequest.put("manuellSegmentation", manuellSegmentation);
+        System.out.println(jsonRequest);
         requestHandler.postSegment(jsonRequest);
     }
 }
