@@ -32,7 +32,7 @@ public class PreProcessing implements OperatorInterface {
         amountOfDoorSensors = 4;
         jsonRequest = new JSONObject();
         extraction = new FeatureExtraction(amountOfMotionSensors, amountOfDoorSensors);
-        windowSize = 5;
+        windowSize = 8;
         segmentation = new Segmentation(windowSize);
     }
 
