@@ -54,6 +54,7 @@ public class FeatureExtraction {
                 device = m.getInput("device").getString();
                 value = m.getInput("value").getString();
 
+
                 if (i == 0) {
                     final String time_to_parse = m.getInput("timestamp").getString();
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");

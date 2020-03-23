@@ -41,7 +41,7 @@ public class PreProcessing implements OperatorInterface {
 
         manuellSegmentation = true;
         training = true;
-        trainingTime = 10; // in days
+        trainingTime = 5; // in days
         start = LocalDateTime.parse("2010-11-04 00:03:50.209589", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"));
         startTime = start;
     }
@@ -58,7 +58,7 @@ public class PreProcessing implements OperatorInterface {
             if (time.minusDays(trainingTime).isAfter(start)){
                 training = false;
             }
-            answer = segmentation.manuell(segment, message, label, training);
+                answer = segmentation.manuell(segment, message, label, training);
         } else {
             answer = segmentation.sensorEventBased(segment, message);
         }
