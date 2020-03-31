@@ -3,6 +3,7 @@ import org.infai.seits.sepl.operators.OperatorInterface;
 
 import org.json.JSONObject;
 
+import javax.swing.text.Segment;
 import java.io.IOException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -23,9 +24,10 @@ public class PreProcessing implements OperatorInterface {
     protected FeatureExtraction extraction;
     protected Segmentation segmentation;
 
+    protected Boolean activityDiscovery;
     protected Boolean training;
-    protected Boolean manuellSegmentation;
     protected Integer trainingTime;
+    protected Boolean otherClass;
     protected LocalDateTime start;
 
     protected List answer;
@@ -35,13 +37,14 @@ public class PreProcessing implements OperatorInterface {
         amountOfMotionSensors = 32;
         amountOfDoorSensors = 4;
         jsonRequest = new JSONObject();
-        windowSize = 9;
+        windowSize = 6;
         extraction = new FeatureExtraction(amountOfMotionSensors, amountOfDoorSensors, windowSize);
         segmentation = new Segmentation(windowSize);
 
-        manuellSegmentation = true;
+        activityDiscovery = true;
         training = true;
-        trainingTime = 5; // in days
+        trainingTime = 6; // in days
+        otherClass = true;
         start = LocalDateTime.parse("2010-11-04 00:03:50.209589", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"));
         startTime = start;
     }
@@ -54,25 +57,26 @@ public class PreProcessing implements OperatorInterface {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
         LocalDateTime time = LocalDateTime.parse(time_to_parse, formatter);
 
-        if (training && manuellSegmentation){
-            if (time.minusDays(trainingTime).isAfter(start)){
-                training = false;
-            }
-                answer = segmentation.manuell(segment, message, label, training);
+        /* Training or not */
+        if (time.minusDays(trainingTime).isAfter(start)){
+            training = false;
+        }
+
+        if(!otherClass && label.equals("Other")){
+            System.out.println("OtherClass is excluded, this message will be skipped!");
         } else {
             answer = segmentation.sensorEventBased(segment, message);
-        }
-        segment = (Stack) answer.get(1);
-
-        if ((Boolean)answer.get(0)){
-            try {
-                extraction.run(segment, label, startTime, training, manuellSegmentation);
-                segment.clear();
-                segment.add(message);
-                startTime = time;
-                System.out.println(startTime);
-            } catch (IOException e) {
-                e.printStackTrace();
+            segment = (Stack) answer.get(1);
+            if ((Boolean)answer.get(0)){
+                try {
+                    extraction.run(segment, label, startTime, training, activityDiscovery);
+                    segment.clear();
+                    segment.add(message);
+                    startTime = time;
+                    System.out.println(startTime);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

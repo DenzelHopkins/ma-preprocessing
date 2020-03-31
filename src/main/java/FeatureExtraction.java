@@ -21,7 +21,7 @@ public class FeatureExtraction {
     double triggeredMotionSensors;
     double triggeredDoorSensors;
 
-    double maxSensors;
+    double windowSize;
 
     RequestHandler requestHandler = new RequestHandler();
     JSONObject jsonRequest = new JSONObject();
@@ -37,23 +37,24 @@ public class FeatureExtraction {
         feature = new ArrayList<>();
         amountOfMotionSensors = MotionSensors;
         amountOfDoorSensors = DoorSensors;
-        maxSensors = WindowSize;
+        windowSize = WindowSize;
 
     }
 
-    public void run(Stack<Message> segment, String label, LocalDateTime startTime, Boolean training, Boolean manuellSegmentation) throws IOException {
+    public void run(Stack<Message> segment, String label, LocalDateTime startTime, Boolean training, Boolean activityDiscovery) throws IOException {
         feature.clear();
         motionSensors = new ArrayList<>(Collections.nCopies(amountOfMotionSensors * 2, 0.0)); /*[M001ON, M002ON, ... , M031OFF, MO32OFF]*/
         doorSensors = new ArrayList<>(Collections.nCopies(amountOfDoorSensors * 2, 0.0)); /*[M001ON, M002ON, ... , M031OFF, MO32OFF]*/
         triggeredMotionSensors = 0;
+        triggeredDoorSensors = 0;
+        windowSize = segment.size();
 
         // building featureSegment
         {
-            for (int i = 0; i < segment.size(); i++) {
+            for (int i = 0; i < windowSize; i++) {
                 m = segment.pop();
                 device = m.getInput("device").getString();
                 value = m.getInput("value").getString();
-
 
                 if (i == 0) {
                     final String time_to_parse = m.getInput("timestamp").getString();
@@ -101,50 +102,51 @@ public class FeatureExtraction {
                         default:
                             feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
                     }
-                    /*DayOfWeek*/
-                    switch (time.getDayOfWeek()) {
-                        case MONDAY:
-                            feature.addAll(Arrays.asList(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-                            break;
-                        case TUESDAY:
-                            feature.addAll(Arrays.asList(0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-                            break;
-                        case WEDNESDAY:
-                            feature.addAll(Arrays.asList(0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0));
-                            break;
-                        case THURSDAY:
-                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0));
-                            break;
-                        case FRIDAY:
-                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0));
-                            break;
-                        case SATURDAY:
-                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0));
-                            break;
-                        case SUNDAY:
-                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0));
-                            break;
-                        default:
-                            System.out.println("--------------------NO WEEKDAY SET ");
-                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-                    }
-                    /*WeekendOrNot*/
-                    switch (time.getDayOfWeek()) {
-                        case MONDAY:
-                        case TUESDAY:
-                        case WEDNESDAY:
-                        case THURSDAY:
-                            feature.addAll(Arrays.asList(1.0, 0.0));
-                            break;
-                        case FRIDAY:
-                        case SATURDAY:
-                        case SUNDAY:
-                            feature.addAll(Arrays.asList(0.0, 1.0));
-                            break;
-                        default:
-                            System.out.println("--------------------NO WEEKEND SET ");
-                            feature.addAll(Arrays.asList(0.0, 0.0));
-                    }
+//                    /*DayOfWeek*/
+//                    switch (time.getDayOfWeek()) {
+//                        case MONDAY:
+//                            feature.addAll(Arrays.asList(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+//                            break;
+//                        case TUESDAY:
+//                            feature.addAll(Arrays.asList(0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+//                            break;
+//                        case WEDNESDAY:
+//                            feature.addAll(Arrays.asList(0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0));
+//                            break;
+//                        case THURSDAY:
+//                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0));
+//                            break;
+//                        case FRIDAY:
+//                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0));
+//                            break;
+//                        case SATURDAY:
+//                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0));
+//                            break;
+//                        case SUNDAY:
+//                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0));
+//                            break;
+//                        default:
+//                            System.out.println("--------------------NO WEEKDAY SET ");
+//                            feature.addAll(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+//                    }
+//
+//                    /*WeekendOrNot*/
+//                    switch (time.getDayOfWeek()) {
+//                        case MONDAY:
+//                        case TUESDAY:
+//                        case WEDNESDAY:
+//                        case THURSDAY:
+//                            feature.addAll(Arrays.asList(1.0, 0.0));
+//                            break;
+//                        case FRIDAY:
+//                        case SATURDAY:
+//                        case SUNDAY:
+//                            feature.addAll(Arrays.asList(0.0, 1.0));
+//                            break;
+//                        default:
+//                            System.out.println("--------------------NO WEEKEND SET ");
+//                            feature.addAll(Arrays.asList(0.0, 0.0));
+//                    }
                 }
 
                 currentSensorNumber = Integer.parseInt(device.replaceAll("\\D+", ""));
@@ -160,37 +162,40 @@ public class FeatureExtraction {
                 }
 
                 /* DoorSensor triggered or not */
-                else if (device.contains("D")) {
-                    if (value.equals("ON") && doorSensors.get(currentSensorNumber - 1) == 0.0) {
+                else if (device.contains("T")) {
+                    if (value.equals("OPEN") && doorSensors.get(currentSensorNumber - 1) == 0.0) {
                         doorSensors.set(currentSensorNumber - 1, 1.0);
-                    } else if (value.equals("OFF") && doorSensors.get(currentSensorNumber + amountOfDoorSensors - 1) == 0.0) {
+                    } else if (value.equals("CLOSE") && doorSensors.get(currentSensorNumber + amountOfDoorSensors - 1) == 0.0) {
                         doorSensors.set(currentSensorNumber + amountOfDoorSensors - 1, 1.0);
                     }
                     triggeredDoorSensors++;
                 }
             }
-
-
-            /* Amount of triggered motionSensors and doorSensors */
-//            double triggeredMotionSensorsPre = (triggeredMotionSensors - 0) / (maxSensors - 0);
-//            double triggeredDoorSensorsPre = (triggeredDoorSensors - 0) / (maxSensors - 0);
-//            feature.add(triggeredMotionSensorsPre);
-//            feature.add(triggeredDoorSensorsPre);
-
+            /* Adding door and motions */
             feature.addAll(doorSensors);
             feature.addAll(motionSensors);
-            // add time feature
+
+            /* Amount of triggered motionSensors and doorSensors */
+            double triggeredMotionSensorsPre = triggeredMotionSensors / windowSize;
+            double triggeredDoorSensorsPre = triggeredDoorSensors / windowSize;
+            feature.add(triggeredMotionSensorsPre);
+            feature.add(triggeredDoorSensorsPre);
+
+            /* add time feature */
             Date date = Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
             feature.add((double) date.getTime());
+
         }
 
         // http request to the server with the featureSegment and set answer to solution
         jsonRequest.put("label", label);
         jsonRequest.put("feature", feature);
         jsonRequest.put("training", training);
-        jsonRequest.put("manuellSegmentation", manuellSegmentation);
+        jsonRequest.put("activityDiscovery", activityDiscovery);
         System.out.println(jsonRequest);
         requestHandler.postSegment(jsonRequest);
+
+
     }
 }
 

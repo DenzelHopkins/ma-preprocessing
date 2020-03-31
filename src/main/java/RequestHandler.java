@@ -41,10 +41,8 @@ public class RequestHandler {
             CloseableHttpResponse response = httpClient.execute(get);
             try {
                 JSONObject result = new JSONObject(EntityUtils.toString(response.getEntity()));
-                String founded_activities = result.get("founded_activities").toString();
-                String accuracy = result.get("accuracy").toString();
-                System.out.println("Founded activities are: " + founded_activities);
-                System.out.println("Accuracy is: " + accuracy);
+                String answer = result.get("answer").toString();
+                System.out.println(answer);
             } finally {
                 response.close();
             }
