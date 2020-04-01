@@ -192,7 +192,7 @@ public class FeatureExtraction {
         jsonRequest.put("feature", feature);
         jsonRequest.put("training", training);
         jsonRequest.put("activityDiscovery", activityDiscovery);
-        System.out.println(jsonRequest);
+        //System.out.println(jsonRequest);
         requestHandler.postSegment(jsonRequest);
 
 

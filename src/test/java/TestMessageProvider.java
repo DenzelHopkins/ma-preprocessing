@@ -11,7 +11,7 @@ import java.util.List;
 
 public class TestMessageProvider {
     public static List<Message> getTestMesssagesSet() throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader("src/test/resources/arubaSmall.json"));
+        BufferedReader br = new BufferedReader(new FileReader("src/test/resources/arubaVerySmall.json"));
         Builder builder = new Builder("1", "1");
         List<Message> messageSet = new ArrayList<>();
         JSONObject config = getConfig();

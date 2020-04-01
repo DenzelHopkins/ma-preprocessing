@@ -37,13 +37,13 @@ public class PreProcessing implements OperatorInterface {
         amountOfMotionSensors = 32;
         amountOfDoorSensors = 4;
         jsonRequest = new JSONObject();
-        windowSize = 6;
+        windowSize = 10;
         extraction = new FeatureExtraction(amountOfMotionSensors, amountOfDoorSensors, windowSize);
         segmentation = new Segmentation(windowSize);
 
         activityDiscovery = true;
         training = true;
-        trainingTime = 6; // in days
+        trainingTime = 30; // in days
         otherClass = true;
         start = LocalDateTime.parse("2010-11-04 00:03:50.209589", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"));
         startTime = start;
@@ -53,29 +53,34 @@ public class PreProcessing implements OperatorInterface {
     public void run(Message message) {
 
         label = message.getInput("activity").getString();
-        time_to_parse = message.getInput("timestamp").getString();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
-        LocalDateTime time = LocalDateTime.parse(time_to_parse, formatter);
 
-        /* Training or not */
-        if (time.minusDays(trainingTime).isAfter(start)){
-            training = false;
-        }
-
-        if(!otherClass && label.equals("Other")){
-            System.out.println("OtherClass is excluded, this message will be skipped!");
+        if(label.contains("T")){
+            System.out.println("Is Temperature, this message will be skipped!");
         } else {
-            answer = segmentation.sensorEventBased(segment, message);
-            segment = (Stack) answer.get(1);
-            if ((Boolean)answer.get(0)){
-                try {
-                    extraction.run(segment, label, startTime, training, activityDiscovery);
-                    segment.clear();
-                    segment.add(message);
-                    startTime = time;
-                    System.out.println(startTime);
-                } catch (IOException e) {
-                    e.printStackTrace();
+            time_to_parse = message.getInput("timestamp").getString();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
+            LocalDateTime time = LocalDateTime.parse(time_to_parse, formatter);
+
+            /* Training or not */
+            if (time.minusDays(trainingTime).isAfter(start)){
+                training = false;
+            }
+
+            if(!otherClass && label.equals("Other")){
+                System.out.println("OtherClass is excluded, this message will be skipped!");
+            } else {
+                answer = segmentation.sensorEventBased(segment, message);
+                segment = (Stack) answer.get(1);
+                if ((Boolean)answer.get(0)){
+                    try {
+                        extraction.run(segment, label, startTime, training, activityDiscovery);
+                        segment.clear();
+                        segment.add(message);
+                        startTime = time;
+                        System.out.println("Starttime of the segment: "+ startTime.toString());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
