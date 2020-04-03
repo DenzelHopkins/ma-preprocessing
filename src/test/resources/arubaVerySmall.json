@@ -1,4 +1,4 @@
-{"valugit statue": "ON", "device": "M003", "timestamp": "2010-11-04 00:03:50.209589", "activity": "Sleeping"}
+{"value": "ON", "device": "M003", "timestamp": "2010-11-04 00:03:50.209589", "activity": "Sleeping"}
 {"value": "OFF", "device": "M003", "timestamp": "2010-11-04 00:03:57.399391", "activity": "Sleeping"}
 {"value": "21.5", "device": "T002", "timestamp": "2010-11-04 00:15:08.984841", "activity": "Sleeping"}
 {"value": "21", "device": "T003", "timestamp": "2010-11-04 00:30:19.185547", "activity": "Sleeping"}

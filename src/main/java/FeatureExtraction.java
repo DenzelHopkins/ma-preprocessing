@@ -49,6 +49,8 @@ public class FeatureExtraction {
         triggeredDoorSensors = 0;
         windowSize = segment.size();
 
+        // System.out.println(segment.size());
+
         // building featureSegment
         {
             for (int i = 0; i < windowSize; i++) {
