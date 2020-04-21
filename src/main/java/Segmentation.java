@@ -1,5 +1,4 @@
-import org.apache.kafka.common.protocol.types.Field;
-import org.infai.seits.sepl.operators.Message;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +14,7 @@ public class Segmentation {
         this.currentActivity = "";
     }
 
-    public List<Object> sensorEventBased(Stack<Message> segment, Message message) {
+    public List<Object> sensorEventBased(Stack<JSONObject> segment, JSONObject message) {
         if (segment.size() < windowSize) {
             segment.add(message);
             return Arrays.asList(false, segment);
@@ -23,19 +22,5 @@ public class Segmentation {
             return Arrays.asList(true, segment);
         }
         return Arrays.asList(false, segment);
-    }
-
-    public List<Object> manuell(Stack<Message> segment, Message message, String label, Boolean training) {
-        if (currentActivity.equals(label) && training) {
-            segment.add(message);
-            return Arrays.asList(false, segment);
-        } else {
-            currentActivity = label;
-            if (!segment.isEmpty()){
-                return Arrays.asList(true, segment);
-            } else {
-                return Arrays.asList(false, segment);
-            }
-        }
     }
 }
