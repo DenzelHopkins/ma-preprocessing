@@ -7,9 +7,6 @@ import java.util.*;
 
 public class PreProcessing {
 
-    protected Stack segment;
-    protected JSONObject jsonRequest;
-    protected RequestHandler requestHandler;
     protected String timeToParse;
     protected String label;
     protected FeatureExtraction extraction;
@@ -18,8 +15,13 @@ public class PreProcessing {
     protected Integer trainingDuration;
     protected Boolean otherClass;
     protected LocalDateTime startTime;
+
+    protected Stack segment;
     protected LocalDateTime segmentTime;
     protected List answerSegmentation;
+
+    protected JSONObject jsonRequest;
+    protected RequestHandler requestHandler;
     protected JSONObject activities;
 
     public PreProcessing(boolean otherClass,
@@ -62,13 +64,16 @@ public class PreProcessing {
             if (!otherClass && label.equals("Other")) {
                 System.out.println("OtherClass is excluded, this message will be skipped!");
             } else {
+                /* Use segmentation approach */
                 answerSegmentation = segmentation.sensorEventBased(segment, message);
                 segment = (Stack) answerSegmentation.get(1);
+                /* If segment is ready to analyse extract features and send to server */
                 if ((Boolean) answerSegmentation.get(0)) {
                     try {
-                        jsonRequest = extraction.run(segment,
-                                label, startTime, training);
+                        /* Extract features */
+                        jsonRequest = extraction.run(segment, label, segmentTime, training);
 
+                        /* Send dataPoint to the server */
                         activities = requestHandler.analyseDataPoint(jsonRequest);
 
                         /* Recognized and discovered activity */
@@ -77,6 +82,7 @@ public class PreProcessing {
                                 (" and this is the discoveredActivity: ") +
                                 activities.getString("discoveredActivity")
                         );
+                        /* Clear the segment, add current message and set startTime of the new segment */
                         segment.clear();
                         segment.add(message);
                         segmentTime = time;

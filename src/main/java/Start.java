@@ -9,10 +9,11 @@ import java.time.format.DateTimeFormatter;
 public class Start {
 
     public static void main(String[] args) throws IOException {
-        boolean activityDiscovery = true; // Use Activity Discovery or not
+        String[] systemArray = {"integrated", "baseline", "modification"};
+        String system = systemArray[2];
         boolean otherClass = false; // Include Other-Class or not
         int windowSize = 6; // WindowsSize Sensor based
-        int trainingDuration = 1; // TrainingDuration in days
+        int trainingDuration = 30; // TrainingDuration in days
         int amountOfMotionSensors = 32; // Amount of the Motion Sensors
         int amountOfDoorSensors = 4; // Amount of the Door Sensors
 
@@ -31,7 +32,7 @@ public class Start {
                 startTime);
 
         /* HTTP request to initialize the server */
-        jsonRequest.put("useActivityDiscovery", activityDiscovery);
+        jsonRequest.put("system", system);
         answer = requestHandler.initializeServer(jsonRequest);
         System.out.println(answer.getString("answer"));
 
@@ -43,5 +44,7 @@ public class Start {
             message = new JSONObject(line);
             pre.run(message);
         }
+
+        requestHandler.getSolutions();
     }
 }

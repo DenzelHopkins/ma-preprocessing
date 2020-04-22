@@ -1,4 +1,5 @@
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -35,4 +36,14 @@ public class RequestHandler {
             }
         }
     }
+
+    public void getSolutions() throws IOException {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        try (CloseableHttpResponse response = httpClient.execute(new HttpGet(uri + "solution"))) {
+            JSONObject result = new JSONObject(EntityUtils.toString(response.getEntity()));
+            String answer = result.get("answer").toString();
+            System.out.println(answer);
+        }
+    }
 }
+
