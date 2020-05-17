@@ -1,5 +1,4 @@
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,8 +8,7 @@ import java.time.format.DateTimeFormatter;
 public class Start {
 
     public static void main(String[] args) throws IOException {
-        String[] systemArray = {"integrated", "baseline", "modification"};
-        String system = systemArray[2];
+        String system = args[0];
         boolean otherClass = false; // Include Other-Class or not
         int windowSize = 6; // WindowsSize Sensor based
         int trainingDuration = 30; // TrainingDuration in days
