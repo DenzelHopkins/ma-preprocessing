@@ -129,7 +129,7 @@ public class FeatureExtraction {
                     triggeredDoorSensors++;
                 }
             }
-            /* Adding door and motions */
+            /* Adding door and motions features */
             feature.addAll(doorSensors);
             feature.addAll(motionSensors);
 

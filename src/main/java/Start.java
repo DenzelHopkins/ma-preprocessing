@@ -11,8 +11,8 @@ public class Start {
 
         /* Parameter */
         String system = args[0];
-        boolean otherClass = false; // Include Other-Class or not
-        int windowSize = 6; // WindowsSize Sensor based
+        boolean otherClass = Boolean.parseBoolean(args[1]); // Include Other-Class or not
+        int windowSize = Integer.parseInt(args[2]); // WindowsSize Sensor based
         int trainingDuration = 30; // TrainingDuration in days
         int amountOfMotionSensors = 32; // Amount of the Motion Sensors
         int amountOfDoorSensors = 4; // Amount of the Door Sensors
@@ -37,7 +37,7 @@ public class Start {
         System.out.println(answer.getString("answer"));
 
         /* Iterate over data */
-        BufferedReader br = new BufferedReader(new FileReader("ma-preprocessing/src/main/data/arubaTest.json"));
+        BufferedReader br = new BufferedReader(new FileReader("datenerfassung/src/main/data/arubaTest.json"));
         String line;
         JSONObject message;
         while ((line = br.readLine()) != null) {
