@@ -5,8 +5,9 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class PreProcessing {
+public class Processing {
 
+    /* Parameter */
     protected String timeToParse;
     protected String label;
     protected FeatureExtraction extraction;
@@ -16,20 +17,22 @@ public class PreProcessing {
     protected Boolean otherClass;
     protected LocalDateTime startTime;
 
+    /* Used for segmentation */
     protected Stack segment;
     protected LocalDateTime segmentTime;
     protected List answerSegmentation;
 
+    /* Used for the request */
     protected JSONObject jsonRequest;
     protected RequestHandler requestHandler;
     protected JSONObject activities;
 
-    public PreProcessing(boolean otherClass,
-                         int windowSize,
-                         int trainingDuration,
-                         int amountOfMotionSensors,
-                         int amountOfDoorSensors,
-                         LocalDateTime startTime) {
+    public Processing(boolean otherClass,
+                      int windowSize,
+                      int trainingDuration,
+                      int amountOfMotionSensors,
+                      int amountOfDoorSensors,
+                      LocalDateTime startTime) {
 
         this.otherClass = otherClass;
         this.trainingDuration = trainingDuration;
@@ -41,21 +44,25 @@ public class PreProcessing {
         extraction = new FeatureExtraction(amountOfMotionSensors, amountOfDoorSensors, windowSize);
         segmentation = new Segmentation(windowSize);
         training = true;
-        segmentTime = startTime; // time of the first segment
+        segmentTime = startTime;
     }
 
     public void run(JSONObject message) {
+
+        /* Get label from message */
         label = message.getString("activity");
+
         /* Skip message from temperature sensor */
         if (label.contains("T")) {
             System.out.println("Is Temperature, this message will be skipped!");
         } else {
+
             /* Get time of the message */
             timeToParse = message.getString("timestamp");
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
             LocalDateTime time = LocalDateTime.parse(timeToParse, formatter);
 
-            /* Training or not */
+            /* Check if training or not */
             if (time.minusDays(trainingDuration).isAfter(startTime)) {
                 training = false;
             }
@@ -64,12 +71,15 @@ public class PreProcessing {
             if (!otherClass && label.equals("Other")) {
                 System.out.println("OtherClass is excluded, this message will be skipped!");
             } else {
+
                 /* Use segmentation approach */
                 answerSegmentation = segmentation.sensorEventBased(segment, message);
                 segment = (Stack) answerSegmentation.get(1);
+
                 /* If segment is ready to analyse extract features and send to server */
                 if ((Boolean) answerSegmentation.get(0)) {
                     try {
+
                         /* Extract features */
                         jsonRequest = extraction.run(segment, label, segmentTime, training);
 
